@@ -423,6 +423,18 @@ var GridBuilder = (function () {
 
             var currentX = width - 1;
             var currentY = height - 1;
+            var temp = 0;
+
+            for (var i = 0; i < width; i++) {
+                for (var j = 0; j < height; j++) {
+                    if (mCellMap[i + '_' + j].winningScore > temp) {
+                        temp = mCellMap[i + '_' + j].winningScore;
+                        currentX = i;
+                        currentY = j;
+                    }
+                }
+            }
+
             while (currentX > -1 && currentY > -1) {
 
                 var currentCell = mCellMap[currentX + '_' + currentY];
@@ -436,12 +448,13 @@ var GridBuilder = (function () {
                 }
 
                 if(direction === null) {
-                    if(currentX == 0) {
-                        direction = 'u';
-                    }
-                    if(currentY == 0) {
-                        direction = 's';
-                    }
+                    // if(currentX == 0) {
+                    //     direction = 'u';
+                    // }
+                    // if(currentY == 0) {
+                    //     direction = 's';
+                    // }
+                    return;
                 }
 
                 switch (direction) {
@@ -501,7 +514,7 @@ var GridBuilder = (function () {
                     }
 
                     if (i === 0) {
-                        mPathTable[i][j] = j * gapScore;
+                        mPathTable[i][j] = Math.max(j * gapScore, 0);
                         mCellMap[i + "_" + j] = {
                             'winningScore': mPathTable[i][j]
                         };
@@ -509,7 +522,7 @@ var GridBuilder = (function () {
                     }
 
                     if (j === 0) {
-                        mPathTable[i][j] = i * gapScore;
+                        mPathTable[i][j] = Math.max(i * gapScore, 0);
                         mCellMap[i + "_" + j] = {
                             'winningScore': mPathTable[i][j]
                         };
@@ -529,7 +542,7 @@ var GridBuilder = (function () {
                     var moveUpScore = mPathTable[i][j - 1] + gapScore;
                     var moveSdScore = mPathTable[i - 1][j] + gapScore;
                     var moveDgScore = parseInt(comparisonScore, 10) + parseInt(mPathTable[i - 1][j - 1]);
-                    mPathTable[i][j] = Math.max(moveUpScore, moveSdScore, moveDgScore);
+                    mPathTable[i][j] = Math.max(moveUpScore, moveSdScore, moveDgScore, 0);
 
                     /*
                     This is important when the values collide
@@ -551,16 +564,18 @@ var GridBuilder = (function () {
 
                     var direction = [];
 
-                    if(mPathTable[i][j] === moveDgScore){
-                        direction.push('d');
-                    }
-
-                    if (mPathTable[i][j] === moveUpScore) {
-                        direction.push('u');
-                    }
-
-                    if (mPathTable[i][j] === moveSdScore) {
-                        direction.push('s');
+                    if (mPathTable[i][j] !== 0) {
+                        if(mPathTable[i][j] === moveDgScore){
+                            direction.push('d');
+                        }
+                        if (mPathTable[i][j] === moveUpScore) {
+                            direction.push('u');
+                        }
+                        if (mPathTable[i][j] === moveSdScore) {
+                            direction.push('s');
+                        }
+                    } else {
+                        direction.push(null);
                     }
 
                     mCellMap[i + "_" + j] = {

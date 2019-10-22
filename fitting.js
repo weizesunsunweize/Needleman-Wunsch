@@ -414,7 +414,6 @@ var GridBuilder = (function () {
 
 
     mSelf = {
-
         highlightOptimal: function() {
 
             mIsCustomPathMode = false;
@@ -422,7 +421,16 @@ var GridBuilder = (function () {
             var height = mSideSequence.length + 1;
 
             var currentX = width - 1;
-            var currentY = height - 1;
+            var currentY = 0;
+            var temp = mCellMap[currentX + '_' + currentY].winningScore;
+
+            for (var j = 0; j < height; j++) {
+                if (mCellMap[currentX + '_' + j].winningScore > temp) {
+                    temp = mCellMap[currentX + '_' + j].winningScore;
+                    currentY = j;
+                }
+            }
+
             while (currentX > -1 && currentY > -1) {
 
                 var currentCell = mCellMap[currentX + '_' + currentY];
@@ -437,7 +445,8 @@ var GridBuilder = (function () {
 
                 if(direction === null) {
                     if(currentX == 0) {
-                        direction = 'u';
+                        // direction = 'u';
+                        return;
                     }
                     if(currentY == 0) {
                         direction = 's';
@@ -453,8 +462,6 @@ var GridBuilder = (function () {
                         currentY--;
                         break;
                 }
-
-
             }
 
         },
@@ -492,16 +499,8 @@ var GridBuilder = (function () {
                 mPathTable[i] = [];
                 for (var j = 0; j < height; j++) {
 
-                    if (i === 0 && j === 0) {
-                        mPathTable[i][j] = 0;
-                        mCellMap[i + "_" + j] = {
-                            'winningScore': mPathTable[i][j]
-                        };
-                        continue;
-                    }
-
                     if (i === 0) {
-                        mPathTable[i][j] = j * gapScore;
+                        mPathTable[i][j] = 0;
                         mCellMap[i + "_" + j] = {
                             'winningScore': mPathTable[i][j]
                         };
